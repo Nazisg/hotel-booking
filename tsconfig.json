@@ -1,0 +1,16 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["DOM", "ESNext"],
+    "types": ["vite/client", "jest"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "moduleResolution": "node"
+  }
+}
