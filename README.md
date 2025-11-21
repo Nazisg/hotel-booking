@@ -6,7 +6,7 @@ A dynamic hotel booking application built with **React**, **TypeScript**, **Vite
 
 ## Demo
 
-[Live Demo on Vercel](YOUR_LIVE_URL_HERE)
+[Live Demo on Vercel](https://hotel-booking-seven-umber.vercel.app/)
 
 ---
 
