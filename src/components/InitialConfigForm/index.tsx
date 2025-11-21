@@ -1,21 +1,31 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { setConfig, setBoardType } from "../../store/slices/bookingSlice";
-import type { AppDispatch } from "../../store";
+import type { AppDispatch, RootState } from "../../store";
+import type { BoardTypeCode, Country } from "../../types";
+import { countries as countriesData } from "../../data/data";
 
-const countries = [
-  { id: 1, name: "Turkey" },
-  { id: 2, name: "UAE" },
-  { id: 3, name: "Italy" },
-];
+interface Props {
+  nextStep: () => void;
+}
 
-export const InitialConfigForm: React.FC = () => {
+export const InitialConfigForm: React.FC<Props> = ({ nextStep }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const booking = useSelector((state: RootState) => state.booking);
+
   const [citizenship, setCitizenship] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [daysCount, setDaysCount] = useState<number>(1);
   const [destination, setDestination] = useState<string>("");
-  const [boardType, setBoard] = useState<"FB" | "HB" | "NB">("NB");
+  const [boardType, setBoard] = useState<BoardTypeCode>("NB");
+
+  useEffect(() => {
+    setCitizenship(booking.citizenship || "");
+    setStartDate(booking.startDate || "");
+    setDaysCount(booking.daysCount || 1);
+    setDestination(booking.destination || "");
+    setBoard(booking.boardType || "NB");
+  }, [booking]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,63 +38,101 @@ export const InitialConfigForm: React.FC = () => {
       })
     );
     dispatch(setBoardType(boardType));
-    // Next: navigate to daily configuration (or reveal DailyTable)
+    nextStep();
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 bg-white p-4 rounded shadow">
+    <form onSubmit={onSubmit} className="space-y-6 bg-white p-6 rounded shadow">
+      {/* Citizenship */}
       <div>
-        <label className="block text-sm font-medium">Vətəndaşlıq</label>
+        <label className="block text-sm font-medium">Citizenship</label>
         <select
           required
           value={citizenship}
           onChange={(e) => setCitizenship(e.target.value)}
           className="mt-1 block w-full border rounded p-2"
         >
-          <option value="">Seçin</option>
-          {countries.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+          <option value="">Select</option>
+          {countriesData.map((c: Country) => (
+            <option key={c.id} value={c.name}>
+              {c.name}
+            </option>
+          ))}
         </select>
       </div>
 
+      {/* Date Range and Destination */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium">Başlama Tarixi</label>
-          <input required value={startDate} onChange={e=>setStartDate(e.target.value)} type="date" className="mt-1 block w-full border rounded p-2" />
+          <label className="block text-sm font-medium">Start Date</label>
+          <input
+            required
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="mt-1 block w-full border rounded p-2"
+          />
         </div>
         <div>
-          <label className="block text-sm font-medium">Gün sayı</label>
-          <input required min={1} value={daysCount} onChange={e=>setDaysCount(Number(e.target.value))} type="number" className="mt-1 block w-full border rounded p-2" />
+          <label className="block text-sm font-medium">Number of Days</label>
+          <input
+            required
+            type="number"
+            min={1}
+            value={daysCount}
+            onChange={(e) => setDaysCount(Number(e.target.value))}
+            className="mt-1 block w-full border rounded p-2"
+          />
         </div>
         <div>
-          <label className="block text-sm font-medium">Təyinat Ölkəsi</label>
-          <select required value={destination} onChange={e=>setDestination(e.target.value)} className="mt-1 block w-full border rounded p-2">
-            <option value="">Seçin</option>
-            {countries.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+          <label className="block text-sm font-medium">
+            Destination Country
+          </label>
+          <select
+            required
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            className="mt-1 block w-full border rounded p-2"
+          >
+            <option value="">Select</option>
+            {countriesData.map((c: Country) => (
+              <option key={c.id} value={c.name}>
+                {c.name}
+              </option>
+            ))}
           </select>
         </div>
       </div>
 
+      {/* Board Type */}
       <div>
-        <label className="block text-sm font-medium">Qidalanma Paketi</label>
+        <label className="block text-sm font-medium">Board Type</label>
         <div className="mt-2 flex gap-4">
-          <label className="flex items-center gap-2">
-            <input type="radio" name="board" checked={boardType==="FB"} onChange={()=>setBoard("FB")} />
-            Full Board (FB)
-          </label>
-          <label className="flex items-center gap-2">
-            <input type="radio" name="board" checked={boardType==="HB"} onChange={()=>setBoard("HB")} />
-            Half Board (HB)
-          </label>
-          <label className="flex items-center gap-2">
-            <input type="radio" name="board" checked={boardType==="NB"} onChange={()=>setBoard("NB")} />
-            No Board (NB)
-          </label>
+          {["FB", "HB", "NB"].map((type) => (
+            <label key={type} className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="board"
+                checked={boardType === type}
+                onChange={() => setBoard(type as BoardTypeCode)}
+              />
+              {type === "FB"
+                ? "Full Board (FB)"
+                : type === "HB"
+                ? "Half Board (HB)"
+                : "No Board (NB)"}
+            </label>
+          ))}
         </div>
       </div>
 
+      {/* Submit */}
       <div className="text-right">
-        <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white">
-          Davam et
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+        >
+          Continue
         </button>
       </div>
     </form>

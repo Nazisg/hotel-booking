@@ -46,13 +46,18 @@ const bookingSlice = createSlice({
       const { dayIndex, mealType, mealId } = action.payload;
       if (!state.daily[dayIndex]) return;
       if (mealType === "lunch") state.daily[dayIndex].lunchId = mealId ?? null;
-      if (mealType === "dinner") state.daily[dayIndex].dinnerId = mealId ?? null;
+      if (mealType === "dinner")
+        state.daily[dayIndex].dinnerId = mealId ?? null;
     },
     setBoardType(state, action: PayloadAction<BoardTypeCode>) {
       state.boardType = action.payload;
       // apply rules: if NB -> clear meals
       if (action.payload === "NB") {
-        state.daily = state.daily.map(d => ({ ...d, lunchId: null, dinnerId: null }));
+        state.daily = state.daily.map((d) => ({
+          ...d,
+          lunchId: null,
+          dinnerId: null,
+        }));
       }
     },
     resetBooking() {
@@ -61,7 +66,12 @@ const bookingSlice = createSlice({
   },
 });
 
-export const { setConfig, setDayHotel, setDayMeal, setBoardType, resetBooking } =
-  bookingSlice.actions;
+export const {
+  setConfig,
+  setDayHotel,
+  setDayMeal,
+  setBoardType,
+  resetBooking,
+} = bookingSlice.actions;
 
 export default bookingSlice.reducer;

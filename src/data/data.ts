@@ -15,9 +15,7 @@ export const hotels: Record<string, Hotel[]> = {
     { id: 201, name: "Dubai Marina Hotel", price: 200 },
     { id: 202, name: "Palm Jumeirah Resort", price: 300 },
   ],
-  Italy: [
-    { id: 301, name: "Rome Center Hotel", price: 150 },
-  ],
+  Italy: [{ id: 301, name: "Rome Center Hotel", price: 150 }],
 };
 
 export const boardTypes: { code: BoardTypeCode; name: string }[] = [

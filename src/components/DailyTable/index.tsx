@@ -1,13 +1,21 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState, AppDispatch } from "../../store";
-import type { Meal, Hotel } from "../../types";
+import type { Hotel } from "../../types";
 import { setDayHotel, setDayMeal } from "../../store/slices/bookingSlice";
 import { hotels, meals } from "../../data/data";
-
-export const DailyTable: React.FC = () => {
+interface DailyTableProps {
+  nextStep: () => void;
+  prevStep: () => void;
+}
+export const DailyTable: React.FC<DailyTableProps> = ({
+  nextStep,
+  prevStep,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { daily, destination, boardType } = useSelector((state: RootState) => state.booking);
+  const { daily, destination, boardType } = useSelector(
+    (state: RootState) => state.booking
+  );
 
   if (!destination) return null;
 
@@ -27,8 +35,11 @@ export const DailyTable: React.FC = () => {
         </thead>
         <tbody>
           {daily.map((day, index) => {
-            const lunchDisabled = boardType === "NB" || (boardType === "HB" && day.dinnerId != null);
-            const dinnerDisabled = boardType === "NB" || (boardType === "HB" && day.lunchId != null);
+            const lunchDisabled =
+              boardType === "NB" ||
+              (boardType === "HB" && day.dinnerId != null);
+            const dinnerDisabled =
+              boardType === "NB" || (boardType === "HB" && day.lunchId != null);
 
             return (
               <tr key={day.date} className="text-center">
@@ -38,13 +49,18 @@ export const DailyTable: React.FC = () => {
                 <td className="border p-2">
                   <select
                     value={day.hotelId || ""}
-                    onChange={e =>
-                      dispatch(setDayHotel({ dayIndex: index, hotelId: Number(e.target.value) }))
+                    onChange={(e) =>
+                      dispatch(
+                        setDayHotel({
+                          dayIndex: index,
+                          hotelId: Number(e.target.value),
+                        })
+                      )
                     }
                     className="border rounded px-2 py-1 w-full"
                   >
                     <option value="">Select Hotel</option>
-                    {destinationHotels.map(h => (
+                    {destinationHotels.map((h) => (
                       <option key={h.id} value={h.id}>
                         {h.name} (${h.price})
                       </option>
@@ -57,12 +73,14 @@ export const DailyTable: React.FC = () => {
                   <select
                     value={day.lunchId || ""}
                     disabled={lunchDisabled}
-                    onChange={e =>
+                    onChange={(e) =>
                       dispatch(
                         setDayMeal({
                           dayIndex: index,
                           mealType: "lunch",
-                          mealId: e.target.value ? Number(e.target.value) : null,
+                          mealId: e.target.value
+                            ? Number(e.target.value)
+                            : null,
                         })
                       )
                     }
@@ -71,7 +89,7 @@ export const DailyTable: React.FC = () => {
                     }`}
                   >
                     <option value="">Select Lunch</option>
-                    {destinationMeals.lunch.map(l => (
+                    {destinationMeals.lunch.map((l) => (
                       <option key={l.id} value={l.id}>
                         {l.name} (${l.price})
                       </option>
@@ -84,12 +102,14 @@ export const DailyTable: React.FC = () => {
                   <select
                     value={day.dinnerId || ""}
                     disabled={dinnerDisabled}
-                    onChange={e =>
+                    onChange={(e) =>
                       dispatch(
                         setDayMeal({
                           dayIndex: index,
                           mealType: "dinner",
-                          mealId: e.target.value ? Number(e.target.value) : null,
+                          mealId: e.target.value
+                            ? Number(e.target.value)
+                            : null,
                         })
                       )
                     }
@@ -98,7 +118,7 @@ export const DailyTable: React.FC = () => {
                     }`}
                   >
                     <option value="">Select Dinner</option>
-                    {destinationMeals.dinner.map(d => (
+                    {destinationMeals.dinner.map((d) => (
                       <option key={d.id} value={d.id}>
                         {d.name} (${d.price})
                       </option>
@@ -110,6 +130,20 @@ export const DailyTable: React.FC = () => {
           })}
         </tbody>
       </table>
+      <div className="mt-4 flex justify-between">
+        <button
+          onClick={prevStep}
+          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+        >
+          Back
+        </button>
+        <button
+          onClick={nextStep}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Continue
+        </button>
+      </div>
     </div>
   );
 };
